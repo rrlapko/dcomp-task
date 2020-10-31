@@ -1,0 +1,33 @@
+version: '3.7'
+services:
+  nginx:
+    build: ./nginx
+    ports:
+      - 80:80
+      - 54355:54355
+    depends_on:
+      - web
+  web:
+    build:
+      context: ./app
+    command: python manage.py runserver 0.0.0.0:8000
+    expose:
+      - 8000
+    volumes:
+      - ./app/:/usr/src/app/
+    env_file:
+      - ./.env.dev
+    depends_on:
+      - db
+  db:
+    image: postgres:12.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=hello_django
+      - POSTGRES_PASSWORD=hello_django
+      - POSTGRES_DB=hello_django_dev
+    expose:
+      - 5432
+volumes:
+  postgres_data:
